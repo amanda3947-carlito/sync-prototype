@@ -1318,7 +1318,7 @@
       if (axis === 'y') {
         settle();
         const h = feed.clientHeight;
-        // the browser took the gesture over (native pan): don't fight it, let its own snap finish the page
+        // the browser took the gesture over (native pan): stand aside; the feed's quiet-scroll settle lands it
         if (e.type === 'pointercancel') { stopPaging(); feed.classList.remove('is-paging'); setTimeout(() => { suppressClick = false; }, 0); return; }
         const base = Math.round(startTop / h);
         const flick = Math.abs(vy) > FLICK_VELOCITY && Math.abs(dy) > FLICK_MIN_PX;
@@ -1372,9 +1372,11 @@
   const PAGE_EASE = cubicBezier(0.32, 0.72, 0, 1);
   let pageRaf = 0;
   function stopPaging() { if (pageRaf) cancelAnimationFrame(pageRaf); pageRaf = 0; }
+  const pageTop = (i) => cards[i].card.offsetTop;   // the card's own offset, exact even when heights are fractional
+  const nearestPage = () => clamp(Math.round(feed.scrollTop / feed.clientHeight), 0, cards.length - 1);
   function goToPage(i) {
     i = clamp(i, 0, cards.length - 1);
-    const from = feed.scrollTop, to = i * feed.clientHeight;
+    const from = feed.scrollTop, to = pageTop(i);
     stopPaging();
     if (reduceMotion || Math.abs(to - from) < 1) { feed.classList.remove('is-paging'); feed.scrollTop = to; return; }
     feed.classList.add('is-paging');
@@ -1389,6 +1391,18 @@
     };
     pageRaf = requestAnimationFrame(step);
   }
+  // nothing else should move the feed, but if something does (a cancelled touch the browser took
+  // over, a stray native scroll), it settles on the nearest person once the movement goes quiet
+  let settleTimer = 0;
+  feed.addEventListener('scroll', () => {
+    if (feed.classList.contains('is-paging')) return;
+    clearTimeout(settleTimer);
+    settleTimer = setTimeout(() => {
+      if (feed.classList.contains('is-paging')) return;
+      const i = nearestPage();
+      if (Math.abs(feed.scrollTop - pageTop(i)) > 1) goToPage(i);
+    }, 120);
+  }, { passive: true });
   // a trackpad or wheel swipe pages once per gesture: the first burst past a small threshold
   // moves, the rest of the gesture (and its momentum tail) is ignored until it goes quiet
   let wheelY = 0, wheelQuiet = 0, wheelTaken = false;

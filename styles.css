@@ -69,21 +69,18 @@ img { display: block; }
   height: 100%;
   overflow-y: auto;
   overflow-x: hidden;
-  scroll-snap-type: y mandatory;
   overscroll-behavior: contain;
   scrollbar-width: none;
   touch-action: none;          /* the feed never pans natively: main.js pages it (the profile and rotation row scroll themselves) */
+  /* no CSS scroll-snap: iOS re-snaps to its last remembered point when snapping is switched back on
+     after a scripted move, which bounced the feed to the previous person. main.js owns paging. */
 }
 .feed::-webkit-scrollbar { display: none; }
-/* while a finger or the paging animation is moving the feed, the browser's own snap stays out of it */
-.feed.is-paging { scroll-snap-type: none; }
 
 /* "Feed Card large" — 402 × 874, column, space-between */
 .card {
   position: relative;
   height: 100%;
-  scroll-snap-align: start;
-  scroll-snap-stop: always;
   overflow: hidden;
   touch-action: none;          /* both axes are handled in main.js: pages up/down, profile sideways */
   background: var(--white);
