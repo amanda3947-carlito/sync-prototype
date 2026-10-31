@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@600;700;800&family=DM+Sans:opsz,wght@9..40,400;9..40,600&display=swap">
-  <link rel="stylesheet" href="styles.css?v=9">
+  <link rel="stylesheet" href="styles.css?v=10">
 </head>
 <body>
   <!-- ":: home 1" — 402 × 874 device frame. On a phone it fills the viewport; on a
@@ -26,8 +26,12 @@
             <img src="assets/battery.svg" width="27.328" height="13" alt="">
           </div>
         </div>
+        <!-- "header 3" (1021:30940): your avatar, the wordmark, and the filter. Feed only: the
+             whole chrome goes with the profile. -->
         <div class="header">
-          <img src="assets/header-sync.svg" width="402" height="48" alt="sync">
+          <button class="header__me" type="button" aria-label="Your profile"><img src="assets/avatar-me.png" alt="" draggable="false"></button>
+          <img class="header__mark" src="assets/wordmark-sync.svg" width="77" height="28" alt="sync" draggable="false">
+          <button class="header__filter" type="button" aria-label="Filter the feed"><img src="assets/icon-faders.svg" width="20" height="20" alt="" draggable="false"></button>
         </div>
         <div class="carousel-wrap"><div class="dots-box"></div></div>
       </div>
@@ -132,9 +136,7 @@
               <img src="assets/battery.svg" width="27.328" height="13" alt="">
             </div>
           </div>
-          <div class="header">
-            <img src="assets/header-sync.svg" width="402" height="48" alt="sync">
-          </div>
+          <div class="header"></div>
           <div class="carousel-wrap">
             <div class="carousel">
               <div class="dots-box">
@@ -198,6 +200,6 @@
     </button>
   </template>
 
-  <script src="main.js?v=9"></script>
+  <script src="main.js?v=10"></script>
 </body>
 </html>
