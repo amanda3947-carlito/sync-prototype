@@ -1318,7 +1318,8 @@
       if (axis === 'y') {
         settle();
         const h = feed.clientHeight;
-        if (e.type === 'pointercancel') { goToPage(Math.round(feed.scrollTop / h)); setTimeout(() => { suppressClick = false; }, 0); return; }
+        // the browser took the gesture over (native pan): don't fight it, let its own snap finish the page
+        if (e.type === 'pointercancel') { stopPaging(); feed.classList.remove('is-paging'); setTimeout(() => { suppressClick = false; }, 0); return; }
         const base = Math.round(startTop / h);
         const flick = Math.abs(vy) > FLICK_VELOCITY && Math.abs(dy) > FLICK_MIN_PX;
         const far = Math.abs(dy) > h * 0.25;
