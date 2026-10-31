@@ -690,10 +690,12 @@
       }, { passive: true });
     },
   };
-  // the global like: a tap makes the heart beat (no liked state is designed yet)
+  // the global like: the heart beats and a note to the person in view opens (no liked
+  // state is designed yet)
   const likeBtn = device.querySelector('.device__like');
   const likeArt = likeBtn.querySelector('.device__like-art');
   likeBtn.addEventListener('click', () => {
+    cards[nearestPage()].note();
     if (reduceMotion) return;
     likeArt.animate([
       { transform: 'scale(1)' }, { transform: 'scale(1.28)', offset: 0.3 }, { transform: 'scale(1)', offset: 0.55 },
@@ -751,8 +753,9 @@
     const thumb = root.querySelector('.compose__gif');
     const removeBtn = root.querySelector('.compose__remove');
     const grid = root.querySelector('.compose__grid');
+    const titleEl = root.querySelector('.compose__title');
     const coarse = () => window.matchMedia('(pointer: coarse)').matches;
-    let session = null;      // { unit, punit, profile, fieldBtn, onSend }
+    let session = null;      // { unit, punit, scope, fieldBtn, draftHost, prompt, title, onSend, onClose, hideNav, lift }
     let attachment = null;
     let placeTimer = 0;
 
@@ -778,6 +781,7 @@
     const place = () => {
       if (!session) return;
       setKb();
+      if (!session.unit) return;   // a note has nothing to lift: the title lives in the panel
       const dr = device.getBoundingClientRect();
       const kb = parseFloat(device.style.getPropertyValue('--kb-h')) || 0;
       const panelTop = dr.bottom - kb - panel.offsetHeight;
@@ -809,56 +813,72 @@
     const onKey = (e) => { if (e.key === 'Escape') { e.preventDefault(); close(); } };
     const onViewport = () => { if (session) placeOnce(); };   // a real keyboard changes the room: settle once more
 
+    // a reply to a prompt: the unit lifts above the panel and the page dims around it
     function open(unit, profile, mode, onSend) {
-      if (session) close();
-      const punit = unit.closest('.punit');
       const fieldBtn = unit.querySelector('.preply__field');
-      session = { unit, punit, profile, fieldBtn, onSend, lift: 0 };
-      profile.classList.add('is-locked');   // the page holds still from the first frame
+      start({ unit, punit: unit.closest('.punit'), scope: profile, fieldBtn, draftHost: unit, prompt: fieldBtn.dataset.prompt, onSend, hideNav: true }, mode);
+    }
+    // a note out of the blue (the like): nothing to reply to, so the panel carries a title
+    // instead of a lifted unit. `scope` is what dims and holds still: the profile if it is
+    // up, otherwise the feed card itself. The draft lives on the card, one per person.
+    function openNote(scope, name, card, onSend, onClose) {
+      start({ unit: null, punit: null, scope, fieldBtn: null, draftHost: card, prompt: 'Say something', title: name, onSend, onClose, hideNav: scope.classList.contains('profile') }, 'text');
+    }
+    function start(s, mode) {
+      if (session) close();
+      session = { ...s, lift: 0 };
+      const { unit, punit, scope, draftHost, prompt, title, hideNav } = s;
+      scope.classList.add('is-locked');   // the page holds still from the first frame
       // restore the draft left behind last time
-      const draft = unit._draft || { text: '', gif: null };
+      const draft = draftHost._draft || { text: '', gif: null };
       input.value = draft.text;
-      input.placeholder = fieldBtn.dataset.prompt;
+      input.placeholder = prompt;
       attachment = draft.gif;
       if (attachment) thumb.src = attachment.src;
       refresh();
-      unit.classList.add('is-composing');
-      punit.classList.add('is-focus');
-      profile.classList.add('is-composing');
+      root.classList.toggle('is-note', !unit);
+      titleEl.innerHTML = title ? `Sending a note to <b>${esc(title)}</b>` : '';
+      if (unit) { unit.classList.add('is-composing'); punit.classList.add('is-focus'); }
+      scope.classList.add('is-composing');
       device.classList.add('is-composing');
-      nav.hide();
+      if (hideNav) nav.hide();
       if (mode === 'gif') showGifs(); else showKeyboard();
       placeOnce();
-      profile.addEventListener('pointerdown', onOutside, true);
+      scope.addEventListener('pointerdown', onOutside, true);
       document.addEventListener('keydown', onKey);
       if (window.visualViewport) window.visualViewport.addEventListener('resize', onViewport);
     }
-    function close(keepDraft = true) {
+    function close(keepDraft = true, sending = false) {
       if (!session) return;
-      const { unit, punit, profile, fieldBtn } = session;
+      const { unit, punit, scope, fieldBtn, draftHost, prompt, onClose } = session;
       session = null;
       clearTimeout(placeTimer);
-      profile.removeEventListener('pointerdown', onOutside, true);
+      scope.removeEventListener('pointerdown', onOutside, true);
       document.removeEventListener('keydown', onKey);
       if (window.visualViewport) window.visualViewport.removeEventListener('resize', onViewport);
       const text = input.value.trim();
-      unit._draft = keepDraft ? { text, gif: attachment } : null;
-      // the unit's own pill shows what was left unsent
-      const ph = fieldBtn.querySelector('.preply__ph');
       const hasDraft = keepDraft && (text || attachment);
-      ph.textContent = hasDraft ? (text || 'GIF attached') : fieldBtn.dataset.prompt;
-      fieldBtn.classList.toggle('has-draft', !!hasDraft);
+      draftHost._draft = keepDraft ? { text, gif: attachment } : null;
+      // the unit's own pill shows what was left unsent
+      if (fieldBtn) {
+        const ph = fieldBtn.querySelector('.preply__ph');
+        ph.textContent = hasDraft ? (text || 'GIF attached') : prompt;
+        fieldBtn.classList.toggle('has-draft', !!hasDraft);
+      }
       input.blur();
       input.value = '';
       attachment = null;
       refresh();
-      unit.classList.remove('is-composing');
-      unit.style.removeProperty('--lift');
-      punit.classList.remove('is-focus');
-      profile.classList.remove('is-composing', 'is-locked');
+      if (unit) {
+        unit.classList.remove('is-composing');
+        unit.style.removeProperty('--lift');
+        punit.classList.remove('is-focus');
+      }
+      scope.classList.remove('is-composing', 'is-locked');
       device.classList.remove('is-composing', 'is-keyboard-up', 'is-gifs-up');
       device.style.setProperty('--kb-h', '335px');
       nav.show();
+      if (!sending && onClose) onClose();
     }
     const send = () => {
       if (!session) return;
@@ -866,7 +886,7 @@
       if (!text && !attachment) { close(); return; }
       const onSend = session.onSend;
       const payload = { text, gif: attachment };
-      close(false);
+      close(false, true);
       onSend(payload);
     };
 
@@ -901,7 +921,7 @@
     // taps inside the panel never count as "outside"
     root.addEventListener('pointerdown', (e) => { if (e.target.closest('.compose__gifs, .compose__panel')) e.stopPropagation(); });
 
-    return { open, close, get active() { return !!session; } };
+    return { open, openNote, close, get active() { return !!session; } };
   })();
 
   // ── sent toasts ("mixtape sent" 1053:4536, "spot sent" 1062:4972): the card pops up over
@@ -1254,6 +1274,26 @@
       });
     };
     const openMixtape = (e) => { e.stopPropagation(); hold(); openSheet(person, resume, onSent); };
+
+    // a note from the like: compose opens over whatever is up (the profile, or the photo
+    // itself, held still). Sending follows the reply: the toast plays where the send
+    // happened, the profile (if up) slides back, and the feed moves on.
+    const note = () => {
+      if (compose.active) return;
+      const open = card.classList.contains('is-profile-open');
+      if (!open) hold();
+      compose.openNote(open ? profile : card, person.name, card, ({ text, gif }) => {
+        celebrate(card, 'msg', text || (gif ? 'Sent a GIF' : '')).then(() => {
+          if (!card.classList.contains('is-profile-open')) return;
+          closeProfile(false);
+          return wait(600);
+        }).then(() => {
+          const next = card.nextElementSibling;
+          if (next) { autoAdvancing = true; goToPage(cardIndex() + 1); }
+          else resume();
+        });
+      }, resume);
+    };
     card.querySelector('.tile--mixtape').addEventListener('click', openMixtape);
     profile.querySelector('[data-action="mixtape"]').addEventListener('click', openMixtape);
     wireRecordPlayers(profile.querySelector('.prow-list'), '.prow');
@@ -1368,6 +1408,7 @@
 
     return {
       card,
+      note,
       activate() { active = true; card.focus({ preventScroll: true }); if (!card.classList.contains('is-profile-open')) play(); },
       deactivate() { active = false; pause(); card.classList.remove('is-paused'); hideControl(); },
     };
