@@ -44,7 +44,7 @@
       name: 'Damon',
       disc: 'assets/disc.png',
       items: [
-        { type: 'video', src: 'assets/damon-1.webm', poster: 'assets/bg-damon.png' },
+        { type: 'photo', src: 'assets/bg-damon.png' },
         { type: 'photo', src: 'assets/damon-2.png' },
         { type: 'video', src: 'assets/damon-3.webm', poster: 'assets/damon-3.png' },
         { type: 'photo', src: 'assets/damon-4.png' },
@@ -56,7 +56,7 @@
       name: 'Olivia',
       disc: 'assets/disc.png',
       items: [
-        { type: 'video', src: 'assets/imani-1.webm', poster: 'assets/bg-imani.jpg' },
+        { type: 'photo', src: 'assets/bg-imani.jpg' },
         { type: 'photo', src: 'assets/imani-2.png' },
         { type: 'video', src: 'assets/imani-3.webm', poster: 'assets/imani-3.png' },
         { type: 'photo', src: 'assets/imani-4.png' },
@@ -68,7 +68,7 @@
       name: 'Theo',
       disc: 'assets/disc.png',
       items: [
-        { type: 'video', src: 'assets/theo-1.webm', poster: 'assets/bg-theo.jpg' },
+        { type: 'photo', src: 'assets/bg-theo.jpg' },
         { type: 'photo', src: 'assets/theo-2.png' },
         { type: 'video', src: 'assets/theo-3.webm', poster: 'assets/theo-3.png' },
         { type: 'photo', src: 'assets/theo-4.png' },
@@ -1169,8 +1169,8 @@
       profile.addEventListener('transitionend', onEnd);
       slideTimer = setTimeout(done, reduceMotion ? 0 : 650);
     };
-    const openProfile = () => { profile.scrollTop = 0; collapse(); card.classList.add('is-profile-open'); device.classList.add('is-sheet-up'); profile.setAttribute('aria-hidden', 'false'); pause(); afterSlide(() => { if (card.classList.contains('is-profile-open')) nav.show(); }); };
-    const closeProfile = (resumeVideo = true) => { if (compose.active) compose.close(); card.classList.remove('is-profile-open'); device.classList.remove('is-sheet-up'); profile.setAttribute('aria-hidden', 'true'); if (active && resumeVideo) play(); afterSlide(() => { if (!card.classList.contains('is-profile-open')) nav.show(); }); };
+    const openProfile = () => { profile.scrollTop = 0; collapse(); card.classList.add('is-profile-open'); device.classList.add('is-sheet-up'); profile.setAttribute('aria-hidden', 'false'); pause(); afterSlide(() => { if (card.classList.contains('is-profile-open')) { device.classList.add('is-nav-dark'); nav.show(); } }); };
+    const closeProfile = (resumeVideo = true) => { if (compose.active) compose.close(); card.classList.remove('is-profile-open'); device.classList.remove('is-sheet-up'); profile.setAttribute('aria-hidden', 'true'); if (active && resumeVideo) play(); afterSlide(() => { if (!card.classList.contains('is-profile-open')) { device.classList.remove('is-nav-dark'); nav.show(); } }); };
     card.querySelector('.profile__back').addEventListener('click', closeProfile);
     profile.querySelector('.pbar__back').addEventListener('click', closeProfile);
 
@@ -1318,6 +1318,7 @@
       if (axis === 'y') {
         settle();
         const h = feed.clientHeight;
+        if (e.type === 'pointercancel') { goToPage(Math.round(feed.scrollTop / h)); setTimeout(() => { suppressClick = false; }, 0); return; }
         const base = Math.round(startTop / h);
         const flick = Math.abs(vy) > FLICK_VELOCITY && Math.abs(dy) > FLICK_MIN_PX;
         const far = Math.abs(dy) > h * 0.25;

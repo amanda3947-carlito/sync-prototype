@@ -91,7 +91,6 @@ img { display: block; }
   justify-content: space-between;
   align-items: flex-start;
   isolation: isolate;
-  touch-action: pan-y;
   user-select: none;
   -webkit-user-select: none;
 }
@@ -1055,16 +1054,17 @@ img { display: block; }
   bottom: 24px;
   z-index: 3;
   transform: translateX(-50%);
-  transition: transform 0.75s cubic-bezier(0.32, 0.72, 0, 1), opacity 0.55s;   /* a touch slower than the page move so it eases in behind it */
+  transition: transform 0.75s cubic-bezier(0.32, 0.72, 0, 1);   /* a touch slower than the page move so it eases in behind it; no opacity fade, which would drop the frost */
   --nav-ink: #ffffff;
   --nav-tint-a: rgba(254, 254, 254, 0.142);
   --nav-tint-b: rgba(255, 255, 255, 0.17);
   --nav-rim: rgba(255, 255, 255, 0.45);
   --nav-selected: rgba(255, 255, 255, 0.25);
 }
-.device.is-nav-hidden .device__nav { transform: translate(-50%, calc(100% + 32px)); opacity: 0; pointer-events: none; }
-/* over the profile's white page the glass darkens its ink so the icons stay legible */
-.device.is-sheet-up .device__nav {
+.device.is-nav-hidden .device__nav { transform: translate(-50%, calc(100% + 64px)); pointer-events: none; }   /* fully below the edge, shadow included */
+/* over the profile's white page the glass darkens its ink so the icons stay legible;
+   the switch waits until the profile has landed under the nav (is-nav-dark), not the swipe's start */
+.device.is-nav-dark .device__nav {
   --nav-ink: #303030;
   --nav-tint-a: rgba(255, 255, 255, 0.55);
   --nav-tint-b: rgba(255, 255, 255, 0.4);
