@@ -169,8 +169,10 @@ img { display: block; }
 .header__me { position: relative; width: 36px; height: 36px; padding: 0; border-radius: 999px; overflow: hidden; box-shadow: 0 1px 4px rgba(12, 12, 13, 0.05); pointer-events: auto; transition: transform 0.15s; }
 .header__me img { position: absolute; left: 0; top: -24.96%; width: 100%; height: 149.93%; max-width: none; display: block; }   /* the frame's crop */
 .header__mark { display: block; width: 77px; height: 28px; }
-.header__filter { width: 36px; height: 36px; padding: 0; border-radius: 999px; background: var(--surface); display: flex; align-items: center; justify-content: center; pointer-events: auto; transition: transform 0.15s; }
-.header__filter img { display: block; }
+/* the filter wears the nav's glass (the frame's white-on-surface disc lost the icon over a
+   bright photo); the Faders icon is painted in the nav's ink like the tab icons */
+.header__filter { width: 36px; height: 36px; padding: 0; border-radius: 999px; background: var(--glass-bg); box-shadow: var(--glass-shadow); -webkit-backdrop-filter: var(--glass-blur); backdrop-filter: var(--glass-blur); display: flex; align-items: center; justify-content: center; pointer-events: auto; transition: transform 0.15s; }
+.header__filter-icon { width: 20px; height: 20px; display: block; background: var(--nav-ink); -webkit-mask: url("assets/icon-faders.svg") center / 20px 20px no-repeat; mask: url("assets/icon-faders.svg") center / 20px 20px no-repeat; }
 .header__me:active, .header__filter:active { transform: scale(0.92); }
 /* a note from the feed dims the chrome with the card's own top block */
 .device.is-composing .device__chrome { opacity: 0.25; filter: blur(6px); }
