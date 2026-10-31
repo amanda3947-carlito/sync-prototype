@@ -451,10 +451,22 @@ img { display: block; }
   opacity: 0;
   pointer-events: none;
 }
+/* the protective fade behind the row, drawn 20px past the bar (the frame's gradient stopped
+   at the row's edge, 1021:30973): solid surface behind the name, then off to nothing over
+   the 46px below it. Under it a blur that fades out over the same stretch, so the
+   sheet's content never reads through the name and avatar. */
+.pbar::before, .pbar::after { content: ""; position: absolute; left: 0; right: 0; top: 53px; height: 76px; z-index: -1; pointer-events: none; }
+.pbar::before { background: linear-gradient(to bottom, var(--surface) 30px, rgba(247, 246, 243, 0) 76px); }
+.pbar::after {
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+  -webkit-mask-image: linear-gradient(to bottom, #000 30px, rgba(0, 0, 0, 0) 76px);
+  mask-image: linear-gradient(to bottom, #000 30px, rgba(0, 0, 0, 0) 76px);
+}
 .pbar .statusbar { position: static; transform: none; margin: 0 auto; background: var(--surface); }
 .statusbar--dark .statusbar__time span { color: #303030; }
 .statusbar--dark .statusbar__levels img { filter: invert(0.85); }
-.pbar__row { height: 56px; padding: 10px 20px; display: flex; gap: 10px; align-items: center; background: linear-gradient(to bottom, var(--surface) 26.154%, rgba(255, 255, 255, 0) 88.885%); }
+.pbar__row { height: 56px; padding: 10px 20px; display: flex; gap: 10px; align-items: center; }
 .pbar__avatar { position: relative; width: 42px; height: 42px; flex: 0 0 42px; opacity: 0; }
 .pbar__face { width: 42px; height: 42px; border-radius: 999px; object-fit: cover; object-position: 50% 25%; }
 .pbar__disc { position: absolute; left: 30px; top: 25px; width: 18px; height: 20px; object-fit: contain; }
@@ -520,7 +532,7 @@ img { display: block; }
 /* the rest of the page dims to 25% and frosts around the unit in focus */
 .profile > :not(.pbar), .profile .pbody > *, .profile .punit > * { transition: opacity 0.3s, filter 0.3s; }
 .profile.is-composing > :not(.pbody, .pbar),
-.profile.is-composing .pbar > *,                        /* the bar's own opacity is scroll-driven: dim its contents instead */
+.profile.is-composing .pbar > *, .profile.is-composing .pbar::before, .profile.is-composing .pbar::after,   /* the bar's own opacity is scroll-driven: dim its contents instead */
 .profile.is-composing .pbody > :not(.is-focus),
 .profile.is-composing .punit.is-focus > :not(.pbento-wide) { opacity: 0.25 !important; filter: blur(6px); }   /* 25% and frosted: the page recedes behind the reply */
 .profile.is-composing .punit.is-focus { position: relative; z-index: 8; }   /* the unit in focus sits above the avatar and disc */
