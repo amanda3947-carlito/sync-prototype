@@ -690,6 +690,16 @@
       }, { passive: true });
     },
   };
+  // the global like: a tap makes the heart beat (no liked state is designed yet)
+  const likeBtn = device.querySelector('.device__like');
+  const likeArt = likeBtn.querySelector('.device__like-art');
+  likeBtn.addEventListener('click', () => {
+    if (reduceMotion) return;
+    likeArt.animate([
+      { transform: 'scale(1)' }, { transform: 'scale(1.28)', offset: 0.3 }, { transform: 'scale(1)', offset: 0.55 },
+      { transform: 'scale(1.14)', offset: 0.75 }, { transform: 'scale(1)' },
+    ], { duration: 560, easing: 'ease-out' });
+  });
   // tapping a tab: the glass bubble lifts off, goes translucent, stretches across and
   // settles under the new icon
   const gnavItems = [...device.querySelectorAll('.gnav__item')];

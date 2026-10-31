@@ -1043,15 +1043,16 @@ img { display: block; }
 @keyframes badge-pop { 0% { transform: scale(0.4); opacity: 0; } 70% { transform: scale(1.12); opacity: 1; } 100% { transform: scale(1); opacity: 1; } }
 
 
-/* ── "nav-light" (1051:4424): 224 × 64 liquid-glass bar, p 4, three 72 × 56 items ── */
+/* ── "nav-light" (1051:4424): 224 × 64 liquid-glass bar, p 4, three 72 × 56 items.
+   With the like beside it (1067:6190: nav-light, gap 81, like 62, centred as a group) the bar
+   sits 17px from the left edge rather than centred ── */
 .device { --nav-lift: 90px; }                       /* nav bottom 24 + height 64 + 12 breathing room − the block's own 10 */
 .device.is-nav-hidden { --nav-lift: 0px; }
 .device__nav {
   position: absolute;
-  left: 50%;
+  left: 17px;
   bottom: 24px;
   z-index: 3;
-  transform: translateX(-50%);
   transition: transform 0.75s cubic-bezier(0.32, 0.72, 0, 1);   /* a touch slower than the page move so it eases in behind it; no opacity fade, which would drop the frost */
   --nav-ink: #ffffff;
   --nav-tint-a: rgba(254, 254, 254, 0.142);
@@ -1059,7 +1060,30 @@ img { display: block; }
   --nav-rim: rgba(255, 255, 255, 0.45);
   --nav-selected: rgba(255, 255, 255, 0.25);
 }
-.device.is-nav-hidden .device__nav { transform: translate(-50%, calc(100% + 64px)); pointer-events: none; }   /* fully below the edge, shadow included */
+.device.is-nav-hidden .device__nav { transform: translateY(calc(100% + 64px)); pointer-events: none; }   /* fully below the edge, shadow included */
+/* "profile like" (1067:6200): 62px glass disc, gradient white 14% → 20%, 1px top rim, Drop Shadow/400,
+   holding the fuzzy heart (the toast's render, same crop). Right-aligned 17px in, centred on the nav's
+   height, and never part of the nav's show/hide. Frosted like the nav (the frame draws it without blur). */
+.device__like {
+  position: absolute;
+  right: 17px;
+  bottom: 25px;
+  z-index: 3;
+  width: 62px;
+  height: 62px;
+  border-radius: 50px;
+  background: linear-gradient(to bottom, rgba(255, 255, 255, 0.14) 0%, rgba(255, 255, 255, 0.2) 95.781%);
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 16px 32px rgba(12, 12, 13, 0.4);
+  -webkit-backdrop-filter: blur(24px) saturate(1.4);
+  backdrop-filter: blur(24px) saturate(1.4);
+  overflow: hidden;
+  transition: transform 0.15s;
+}
+.device__like:active { transform: scale(0.94); }
+.device__like-art { position: absolute; left: 11px; top: 12px; width: 39px; height: 37px; overflow: hidden; pointer-events: none; transform-origin: 50% 55%; }
+.device__like-art img { position: absolute; left: -58.79%; top: -101.08%; width: 353.27%; height: 207.01%; max-width: none; }
+
 /* over the profile's white page the glass darkens its ink so the icons stay legible;
    the switch waits until the profile has landed under the nav (is-nav-dark), not the swipe's start */
 .device.is-nav-dark .device__nav {

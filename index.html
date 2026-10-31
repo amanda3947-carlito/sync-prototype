@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@600;700;800&family=DM+Sans:opsz,wght@9..40,400;9..40,600&display=swap">
-  <link rel="stylesheet" href="styles.css?v=5">
+  <link rel="stylesheet" href="styles.css?v=6">
 </head>
 <body>
   <!-- ":: home 1" — 402 × 874 device frame. On a phone it fills the viewport; on a
@@ -75,6 +75,8 @@
         <button class="gnav__item" type="button" data-tab="chats" aria-label="Chats" aria-pressed="false"><span class="gnav__icon gnav__icon--chats"></span></button>
       </div>
     </nav>
+    <!-- "profile like" (1067:6200): the global like, right of the nav; it stays put while the nav shows and hides -->
+    <button class="device__like" type="button" aria-label="Like"><span class="device__like-art"><img src="assets/sent-art.png" alt="" draggable="false"></span></button>
 
     <!-- "bottom sheet _mixtape" (1038:32474) and its search / drag / added states -->
     <div class="device__sheet" aria-hidden="true">
@@ -195,6 +197,6 @@
     </button>
   </template>
 
-  <script src="main.js?v=5"></script>
+  <script src="main.js?v=6"></script>
 </body>
 </html>
