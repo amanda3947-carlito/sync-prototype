@@ -1054,11 +1054,21 @@ img { display: block; }
   bottom: 24px;
   z-index: 3;
   transition: transform 0.75s cubic-bezier(0.32, 0.72, 0, 1);   /* a touch slower than the page move so it eases in behind it; no opacity fade, which would drop the frost */
+}
+/* one glass recipe for the nav and the like: tint, rim, frost and Drop Shadow/400 */
+.device {
   --nav-ink: #ffffff;
   --nav-tint-a: rgba(254, 254, 254, 0.142);
   --nav-tint-b: rgba(255, 255, 255, 0.17);
   --nav-rim: rgba(255, 255, 255, 0.45);
   --nav-selected: rgba(255, 255, 255, 0.25);
+  --glass-bg: linear-gradient(109.18deg, var(--nav-tint-a) 7.51%, var(--nav-tint-b) 91.27%);
+  --glass-shadow:
+    0 16px 32px rgba(12, 12, 13, 0.4),
+    inset 0 1px 0 var(--nav-rim),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.12),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.18);
+  --glass-blur: blur(24px) saturate(1.4);
 }
 .device.is-nav-hidden .device__nav { transform: translateY(calc(100% + 64px)); pointer-events: none; }   /* fully below the edge, shadow included */
 /* "profile like" (1067:6200): 62px glass disc, gradient white 14% → 20%, 1px top rim, Drop Shadow/400,
@@ -1072,13 +1082,12 @@ img { display: block; }
   width: 62px;
   height: 62px;
   border-radius: 50px;
-  background: linear-gradient(to bottom, rgba(255, 255, 255, 0.14) 0%, rgba(255, 255, 255, 0.2) 95.781%);
-  border-top: 1px solid rgba(255, 255, 255, 0.1);
-  box-shadow: 0 16px 32px rgba(12, 12, 13, 0.4);
-  -webkit-backdrop-filter: blur(24px) saturate(1.4);
-  backdrop-filter: blur(24px) saturate(1.4);
+  background: var(--glass-bg);
+  box-shadow: var(--glass-shadow);
+  -webkit-backdrop-filter: var(--glass-blur);
+  backdrop-filter: var(--glass-blur);
   overflow: hidden;
-  transition: transform 0.15s;
+  transition: transform 0.15s, background 0.3s, box-shadow 0.3s;
 }
 .device__like:active { transform: scale(0.94); }
 .device__like-art { position: absolute; left: 11px; top: 12px; width: 39px; height: 37px; overflow: hidden; pointer-events: none; transform-origin: 50% 55%; }
@@ -1086,7 +1095,7 @@ img { display: block; }
 
 /* over the profile's white page the glass darkens its ink so the icons stay legible;
    the switch waits until the profile has landed under the nav (is-nav-dark), not the swipe's start */
-.device.is-nav-dark .device__nav {
+.device.is-nav-dark {
   --nav-ink: #303030;
   --nav-tint-a: rgba(255, 255, 255, 0.55);
   --nav-tint-b: rgba(255, 255, 255, 0.4);
@@ -1099,14 +1108,10 @@ img { display: block; }
   align-items: center;
   padding: 4px;
   border-radius: 300px;
-  background: linear-gradient(109.18deg, var(--nav-tint-a) 7.51%, var(--nav-tint-b) 91.27%);
-  box-shadow:
-    0 10px 40px rgba(0, 0, 0, 0.05),
-    inset 0 1px 0 var(--nav-rim),
-    inset 0 -1px 0 rgba(255, 255, 255, 0.12),
-    inset 0 0 0 1px rgba(255, 255, 255, 0.18);
-  -webkit-backdrop-filter: blur(24px) saturate(1.4);
-  backdrop-filter: blur(24px) saturate(1.4);
+  background: var(--glass-bg);
+  box-shadow: var(--glass-shadow);
+  -webkit-backdrop-filter: var(--glass-blur);
+  backdrop-filter: var(--glass-blur);
   transition: background 0.3s, box-shadow 0.3s;
 }
 .gnav__item {

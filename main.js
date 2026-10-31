@@ -276,7 +276,7 @@
   const tileTpl = document.getElementById('tile-template');
   const mixtapeTpl = document.getElementById('mixtape-template');
   const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  let autoAdvancing = false;   // the feed moved on by itself (after a send): keep the nav up so the badge is seen
+  let autoAdvancing = false;   // the feed moved on by itself (after a send)
 
   const clamp = (n, lo, hi) => Math.min(hi, Math.max(lo, n));
 
@@ -674,7 +674,7 @@
   grab.addEventListener('pointercancel', endSheetDrag);
 
 
-  // ── floating nav: hides when a surface scrolls down, returns when it scrolls up
+  // ── floating nav: always up on the feed; on the profile it hides on scroll down and returns on scroll up
   const nav = {
     show() { device.classList.remove('is-nav-hidden'); },
     hide() { device.classList.add('is-nav-hidden'); },
@@ -1429,20 +1429,15 @@
     goToPage(feedPage() + Math.sign(wheelY));
   }, { passive: false });
 
-  // whichever card is snapped into view is the one playing
+  // whichever card is snapped into view is the one playing. The nav stays up on the feed
+  // (its show/hide only runs on the profile's own scroll), so landing on a person never moves it
   let focused = null;
-  let landedIndex = 0;   // last person the feed snapped to, for the nav's direction
   const io = new IntersectionObserver((entries) => {
     for (const en of entries) {
       const c = cards.find((x) => x.card === en.target);
       if (en.intersectionRatio >= 0.6) {
         if (focused !== c) {
-          // the feed snaps per person, so direction is which person you landed on:
-          // moving down hides the nav, moving back up brings it back
-          const idx = cards.indexOf(c);
-          if (idx > landedIndex && !autoAdvancing) nav.hide(); else if (idx < landedIndex) nav.show();
           autoAdvancing = false;
-          landedIndex = idx;
           if (focused) focused.deactivate();
           focused = c;
           c.activate();
